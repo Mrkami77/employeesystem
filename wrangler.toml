@@ -8,10 +8,6 @@ binding  = "DB"
 database_name = "ems-database"
 database_id   = "a9b03f8a-4e0b-417a-9ef1-41cf30fd03ae"
 
-[[r2_buckets]]
-binding     = "R2"
-bucket_name = "ems-documents"
-
 [[kv_namespaces]]
 binding = "KV"
 id      = "b91b4e2738264f259a0106af4dcea875"
