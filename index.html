@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>EMS Pro — Employee Management System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0f1e;--sidebar:#0d1526;--card:#111827;--card2:#1a2540;
+  --accent:#3b82f6;--accent2:#6366f1;--green:#10b981;--red:#ef4444;
+  --yellow:#f59e0b;--text:#e2e8f0;--muted:#64748b;--border:#1e293b;
+  --white:#ffffff;--shadow:0 4px 24px rgba(0,0,0,0.4)
+}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden}
+/* ── Login ── */
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh;
+  background:linear-gradient(135deg,#0a0f1e 0%,#0d1526 50%,#0a1628 100%)}
+#login-page::before{content:'';position:fixed;inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,0.15) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(99,102,241,0.1) 0%,transparent 50%);pointer-events:none}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:48px 40px;
+  width:420px;box-shadow:var(--shadow),0 0 60px rgba(59,130,246,0.1)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-logo .icon{width:64px;height:64px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:16px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px}
+.login-logo h1{font-size:24px;font-weight:700;color:var(--white)}
+.login-logo p{color:var(--muted);font-size:13px;margin-top:4px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.form-group input{width:100%;padding:12px 16px;background:#1e293b;border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:14px;transition:all 0.2s;outline:none}
+.form-group input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.15)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border:none;border-radius:10px;
+  font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;text-decoration:none}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:var(--white);width:100%;
+  justify-content:center;font-size:15px;padding:14px}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px)}
+.btn-sm{padding:7px 14px;font-size:13px;border-radius:8px}
+.btn-success{background:var(--green);color:var(--white)}
+.btn-success:hover{background:#059669}
+.btn-danger{background:var(--red);color:var(--white)}
+.btn-danger:hover{background:#dc2626}
+.btn-warning{background:var(--yellow);color:#000}
+.btn-secondary{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover{background:#253352}
+.login-tabs{display:flex;background:#1e293b;border-radius:10px;padding:4px;margin-bottom:28px;gap:4px}
+.tab-btn{flex:1;padding:9px;border:none;background:transparent;color:var(--muted);border-radius:8px;
+  cursor:pointer;font-size:13px;font-weight:600;transition:all 0.2s}
+.tab-btn.active{background:var(--accent);color:var(--white)}
+.alert{padding:12px 16px;border-radius:10px;font-size:13px;margin-bottom:16px;display:none}
+.alert-error{background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#fca5a5}
+.alert-success{background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.3);color:#6ee7b7}
+/* ── App Layout ── */
+#app{display:none;height:100vh;flex-direction:row}
+/* ── Sidebar ── */
+#sidebar{width:240px;background:var(--sidebar);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;height:100vh;flex-shrink:0}
+.sidebar-header{padding:20px 20px 16px;border-bottom:1px solid var(--border)}
+.sidebar-brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:40px;height:40px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.brand-text{font-size:16px;font-weight:700;color:var(--white)}
+.brand-sub{font-size:11px;color:var(--muted)}
+.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:1px;padding:8px 12px;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;
+  cursor:pointer;color:var(--muted);font-size:14px;font-weight:500;margin-bottom:2px;transition:all 0.2s;
+  user-select:none}
+.nav-item:hover{background:rgba(59,130,246,0.1);color:var(--text)}
+.nav-item.active{background:rgba(59,130,246,0.2);color:var(--accent);border:1px solid rgba(59,130,246,0.2)}
+.nav-item .nav-icon{font-size:18px;width:22px;text-align:center;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:20px}
+.sidebar-user{padding:14px 16px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.user-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;
+  color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role{font-size:11px;color:var(--muted)}
+.logout-btn{cursor:pointer;color:var(--muted);font-size:18px;padding:4px;border-radius:6px}
+.logout-btn:hover{color:var(--red)}
+/* ── Main Content ── */
+#main-content{flex:1;overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+.topbar{padding:16px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;
+  justify-content:space-between;background:var(--sidebar);flex-shrink:0}
+.page-title{font-size:20px;font-weight:700;color:var(--white)}
+.page-subtitle{font-size:12px;color:var(--muted);margin-top:2px}
+.topbar-actions{display:flex;align-items:center;gap:12px}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.badge-green{background:rgba(16,185,129,0.15);color:var(--green);border:1px solid rgba(16,185,129,0.2)}
+.badge-blue{background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid rgba(59,130,246,0.2)}
+.badge-red{background:rgba(239,68,68,0.15);color:var(--red);border:1px solid rgba(239,68,68,0.2)}
+.badge-yellow{background:rgba(245,158,11,0.15);color:var(--yellow);border:1px solid rgba(245,158,11,0.2)}
+.content-body{padding:28px;flex:1}
+/* ── Stat Cards ── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:28px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;
+  position:relative;overflow:hidden;transition:transform 0.2s}
+.stat-card:hover{transform:translateY(-2px)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.stat-card.blue::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.stat-card.green::before{background:linear-gradient(90deg,var(--green),#34d399)}
+.stat-card.red::before{background:linear-gradient(90deg,var(--red),#f87171)}
+.stat-card.yellow::before{background:linear-gradient(90deg,var(--yellow),#fbbf24)}
+.stat-card.purple::before{background:linear-gradient(90deg,#8b5cf6,#a78bfa)}
+.stat-card.cyan::before{background:linear-gradient(90deg,#06b6d4,#22d3ee)}
+.stat-icon{font-size:32px;margin-bottom:12px}
+.stat-value{font-size:32px;font-weight:800;color:var(--white);line-height:1}
+.stat-label{font-size:13px;color:var(--muted);margin-top:6px}
+.stat-change{font-size:12px;margin-top:8px;color:var(--green)}
+/* ── Grid Panels ── */
+.panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:28px}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.panel-header{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.panel-title{font-size:15px;font-weight:700;color:var(--white)}
+.panel-body{padding:0}
+/* ── Table ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{padding:11px 16px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;
+  letter-spacing:0.5px;color:var(--muted);background:rgba(255,255,255,0.03);border-bottom:1px solid var(--border)}
+td{padding:13px 16px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+tr:hover td{background:rgba(255,255,255,0.02)}
+tr:last-child td{border-bottom:none}
+.td-name{display:flex;align-items:center;gap:10px}
+.mini-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+/* ── Search & Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.search-box{flex:1;min-width:200px;position:relative}
+.search-box input{width:100%;padding:10px 14px 10px 38px;background:var(--card);border:1px solid var(--border);
+  border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:all 0.2s}
+.search-box input:focus{border-color:var(--accent)}
+.search-box::before{content:'🔍';position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px}
+select{padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:10px;
+  color:var(--text);font-size:13px;outline:none;cursor:pointer}
+select option{background:var(--card)}
+/* ── Modal ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;
+  align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;width:540px;max-width:95vw;
+  max-height:90vh;overflow-y:auto;box-shadow:var(--shadow)}
+.modal-header{padding:24px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:18px;font-weight:700;color:var(--white)}
+.modal-close{background:none;border:none;color:var(--muted);font-size:22px;cursor:pointer;padding:4px}
+.modal-close:hover{color:var(--red)}
+.modal-body{padding:24px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:11px 14px;background:#1e293b;
+  border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;outline:none;transition:border 0.2s}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.form-group textarea{resize:vertical;min-height:80px;font-family:inherit}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
+/* ── Chat ── */
+.chat-container{display:flex;flex-direction:column;height:calc(100vh - 180px);background:var(--card);
+  border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.chat-bubble{max-width:75%;padding:14px 18px;border-radius:18px;font-size:14px;line-height:1.6}
+.bubble-user{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;
+  align-self:flex-end;border-bottom-right-radius:4px}
+.bubble-ai{background:var(--card2);border:1px solid var(--border);color:var(--text);
+  align-self:flex-start;border-bottom-left-radius:4px}
+.bubble-meta{font-size:11px;color:var(--muted);margin-top:4px}
+.bubble-user .bubble-meta{text-align:right}
+.chat-input-area{border-top:1px solid var(--border);padding:16px 20px;display:flex;gap:12px}
+.chat-input-area input{flex:1;padding:12px 18px;background:#1e293b;border:1px solid var(--border);
+  border-radius:12px;color:var(--text);font-size:14px;outline:none;transition:border 0.2s}
+.chat-input-area input:focus{border-color:var(--accent)}
+.send-btn{padding:12px 22px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;border-radius:12px;color:#fff;font-size:14px;font-weight:600;cursor:pointer;transition:opacity 0.2s}
+.send-btn:hover{opacity:0.9}
+.typing-indicator{display:flex;gap:5px;align-items:center;padding:14px 18px;background:var(--card2);
+  border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:4px;align-self:flex-start}
+.dot{width:8px;height:8px;background:var(--muted);border-radius:50%;animation:bounce 1.4s infinite}
+.dot:nth-child(2){animation-delay:0.2s}
+.dot:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-8px)}}
+/* ── Section Visibility ── */
+.section{display:none}
+.section.active{display:block}
+/* ── Dept Bar Chart ── */
+.dept-list{padding:16px 20px}
+.dept-row{margin-bottom:14px}
+.dept-row-header{display:flex;justify-content:space-between;margin-bottom:5px}
+.dept-row-name{font-size:13px;color:var(--text)}
+.dept-row-count{font-size:12px;color:var(--muted)}
+.dept-bar-bg{height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.dept-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width 0.8s ease}
+/* ── Status pill ── */
+.status-pill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase}
+.status-active{background:rgba(16,185,129,0.15);color:var(--green)}
+.status-inactive{background:rgba(239,68,68,0.15);color:var(--red)}
+/* ── Notification toast ── */
+#toast{position:fixed;bottom:28px;right:28px;padding:14px 20px;border-radius:12px;font-size:14px;
+  font-weight:600;z-index:9999;transform:translateY(100px);transition:transform 0.3s;pointer-events:none;
+  max-width:340px;box-shadow:var(--shadow)}
+#toast.show{transform:translateY(0)}
+#toast.toast-success{background:#065f46;border:1px solid var(--green);color:#6ee7b7}
+#toast.toast-error{background:#7f1d1d;border:1px solid var(--red);color:#fca5a5}
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* ── Activity list ── */
+.activity-list{padding:4px 0}
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.activity-item:last-child{border-bottom:none}
+.activity-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.act-create{background:rgba(16,185,129,0.15)}
+.act-update{background:rgba(59,130,246,0.15)}
+.act-delete{background:rgba(239,68,68,0.15)}
+.act-login{background:rgba(99,102,241,0.15)}
+.activity-detail{flex:1;min-width:0}
+.activity-detail strong{font-size:13px;color:var(--text)}
+.activity-detail span{font-size:12px;color:var(--muted);display:block;margin-top:1px}
+.activity-time{font-size:11px;color:var(--muted);flex-shrink:0}
+/* ── Empty state ── */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-state .empty-icon{font-size:48px;margin-bottom:16px}
+.empty-state h3{font-size:16px;color:var(--text);margin-bottom:8px}
+/* ── Doc upload area ── */
+.upload-area{border:2px dashed var(--border);border-radius:12px;padding:30px;text-align:center;cursor:pointer;transition:border 0.2s}
+.upload-area:hover{border-color:var(--accent)}
+/* ── History table tags ── */
+.q-tag{background:rgba(59,130,246,0.12);color:var(--accent);padding:3px 10px;border-radius:6px;font-size:11px;font-weight:600}
+/* ── Responsive ── */
+@media(max-width:900px){
+  #sidebar{width:60px}
+  .nav-item span,.brand-text,.brand-sub,.nav-section,.user-info{display:none}
+  .nav-item{justify-content:center;padding:12px}
+  .nav-item .nav-icon{width:auto}
+  .sidebar-user{justify-content:center;padding:12px}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .panels-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ LOGIN PAGE ══════════════════ -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="icon">🏢</div>
+      <h1>EMS Pro</h1>
+      <p>Enterprise Employee Management System</p>
+    </div>
+    <div class="login-tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('register')">Register</button>
+    </div>
+    <div id="auth-alert" class="alert alert-error"></div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="login-email" placeholder="admin@company.com" value="admin@company.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-password" placeholder="••••••••" value="Admin@123"/>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Sign In to Dashboard</button>
+      <p style="text-align:center;margin-top:16px;font-size:12px;color:var(--muted)">
+        Demo: admin@company.com / Admin@123
+      </p>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Your Name"/>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="reg-email" placeholder="you@company.com"/>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-password" placeholder="Min 8 characters"/>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Create Account</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ MAIN APP ══════════════════ -->
+<div id="app">
+  <!-- Sidebar -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🏢</div>
+        <div>
+          <div class="brand-text">EMS Pro</div>
+          <div class="brand-sub">v1.0.0</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar-nav">
+      <div class="nav-section">Main</div>
+      <div class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </div>
+      <div class="nav-item" onclick="showSection('employees')" id="nav-employees">
+        <span class="nav-icon">👥</span><span>Employees</span>
+      </div>
+      <div class="nav-section">AI Support</div>
+      <div class="nav-item" onclick="showSection('chat')" id="nav-chat">
+        <span class="nav-icon">🤖</span><span>AI Chat</span>
+      </div>
+      <div class="nav-item" onclick="showSection('history')" id="nav-history">
+        <span class="nav-icon">💬</span><span>Chat History</span>
+      </div>
+      <div class="nav-section">Admin</div>
+      <div class="nav-item" onclick="showSection('audit')" id="nav-audit">
+        <span class="nav-icon">🔍</span><span>Audit Logs</span>
+      </div>
+      <div class="nav-item" onclick="showSection('api')" id="nav-api">
+        <span class="nav-icon">⚡</span><span>API Gateway</span>
+      </div>
+      <div class="nav-item" onclick="showSection('health')" id="nav-health">
+        <span class="nav-icon">❤️</span><span>Health Check</span>
+      </div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebar-avatar">A</div>
+      <div class="user-info">
+        <div class="user-name" id="sidebar-name">Admin</div>
+        <div class="user-role" id="sidebar-role">Administrator</div>
+      </div>
+      <div class="logout-btn" onclick="doLogout()" title="Logout">⏻</div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main id="main-content">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="section-dashboard" class="section active">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Dashboard</div>
+          <div class="page-subtitle">Welcome back! Here's your overview.</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge badge-green">● System Online</span>
+          <span id="current-time" style="font-size:13px;color:var(--muted)"></span>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="stats-grid" id="stats-grid">
+          <div class="stat-card blue"><div class="stat-icon">👥</div><div class="stat-value" id="s-total">—</div><div class="stat-label">Total Employees</div><div class="stat-change">▲ All departments</div></div>
+          <div class="stat-card green"><div class="stat-icon">✅</div><div class="stat-value" id="s-active">—</div><div class="stat-label">Active Employees</div><div class="stat-change">▲ Currently working</div></div>
+          <div class="stat-card purple"><div class="stat-icon">🏬</div><div class="stat-value" id="s-dept">—</div><div class="stat-label">Departments</div><div class="stat-change">▲ Organizational units</div></div>
+          <div class="stat-card yellow"><div class="stat-icon">🤖</div><div class="stat-value" id="s-conv">—</div><div class="stat-label">AI Conversations</div><div class="stat-change">▲ Support queries</div></div>
+          <div class="stat-card cyan"><div class="stat-icon">📋</div><div class="stat-value" id="s-audit">—</div><div class="stat-label">Audit Events</div><div class="stat-change">▲ Security logs</div></div>
+          <div class="stat-card red"><div class="stat-icon">📄</div><div class="stat-value" id="s-docs">—</div><div class="stat-label">Documents (R2)</div><div class="stat-change">▲ Uploaded files</div></div>
+        </div>
+
+        <div class="panels-grid">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Department Breakdown</span>
+              <span class="badge badge-blue">Live</span>
+            </div>
+            <div class="dept-list" id="dept-chart"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Recent Activity</span>
+              <button class="btn btn-sm btn-secondary" onclick="showSection('audit')">View All</button>
+            </div>
+            <div class="activity-list" id="activity-list"></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-title">Recently Added Employees</span>
+            <button class="btn btn-sm btn-success" onclick="showSection('employees')">Manage All</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Department</th><th>Position</th><th>Status</th><th>Joined</th></tr></thead>
+              <tbody id="recent-employees"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EMPLOYEES ── -->
+    <div id="section-employees" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Employee Management</div>
+          <div class="page-subtitle">Add, view, update, and delete employee records</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-sm btn-success" onclick="openModal('add')">+ Add Employee</button>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="toolbar">
+          <div class="search-box"><input type="text" id="emp-search" placeholder="Search by name, email, department…" oninput="searchEmployees()"/></div>
+          <select id="dept-filter" onchange="searchEmployees()">
+            <option value="">All Departments</option>
+          </select>
+          <select id="status-filter" onchange="searchEmployees()">
+            <option value="">All Status</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Employee</th><th>Department</th><th>Position</th><th>Salary</th><th>Phone</th><th>Status</th><th>Hired</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="employees-table"></tbody>
+            </table>
+          </div>
+          <div id="emp-pagination" style="padding:16px 20px;display:flex;gap:8px;align-items:center;border-top:1px solid var(--border)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AI CHAT ── -->
+    <div id="section-chat" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">AI Support Chat</div>
+          <div class="page-subtitle">Ask questions — powered by EMS AI Knowledge Base</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge badge-green">🤖 AI Online</span>
+        </div>
+      </div>
+      <div class="content-body" style="padding-bottom:0">
+        <div class="chat-container">
+          <div class="chat-messages" id="chat-messages">
+            <div class="chat-bubble bubble-ai">
+              👋 Hello! I'm the EMS AI Assistant. I can help you with:
+              <br><br>
+              • 📅 <strong>Leave policies</strong> and remaining days<br>
+              • 💰 <strong>Salary & benefits</strong> information<br>
+              • 🏢 <strong>Department</strong> structure<br>
+              • 📋 <strong>HR policies</strong> and procedures<br>
+              • 🌐 <strong>Remote work</strong> guidelines<br>
+              <br>
+              What would you like to know?
+              <div class="bubble-meta">EMS AI · Just now</div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="Type your question… (e.g. How many leave days do I have?)"
+              onkeydown="if(event.key==='Enter')sendChat()"/>
+            <button class="send-btn" onclick="sendChat()">Send ➤</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CHAT HISTORY ── -->
+    <div id="section-history" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Conversation History</div>
+          <div class="page-subtitle">All AI support interactions stored in database</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-sm btn-secondary" onclick="loadHistory()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Question</th><th>AI Response</th><th>Timestamp</th></tr></thead>
+              <tbody id="history-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AUDIT LOGS ── -->
+    <div id="section-audit" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">Audit Logs</div>
+          <div class="page-subtitle">Security and activity tracking</div>
+        </div>
+        <div class="topbar-actions">
+          <span class="badge badge-yellow">⚠ Admin Only</span>
+          <button class="btn btn-sm btn-secondary" onclick="loadAuditLogs()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Resource</th><th>Details</th><th>IP</th></tr></thead>
+              <tbody id="audit-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── API GATEWAY ── -->
+    <div id="section-api" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">API Gateway — Cloudflare Edge</div>
+          <div class="page-subtitle">Versioned REST API endpoints with JWT, caching, and rate limiting</div>
+        </div>
+      </div>
+      <div class="content-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px">
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Authentication Flow</span></div>
+            <div style="padding:20px;font-size:13px;line-height:2;color:var(--muted)">
+              <div style="background:#1e293b;border-radius:10px;padding:16px;font-family:monospace;font-size:12px;color:var(--text)">
+                <span style="color:#6ee7b7">POST</span> /api/v1/auth/login<br>
+                &nbsp;&nbsp;→ Validate credentials<br>
+                &nbsp;&nbsp;→ <span style="color:#93c5fd">Generate JWT (HS256)</span><br>
+                &nbsp;&nbsp;→ Return token + user<br><br>
+                <span style="color:#fbbf24">Authorization:</span> Bearer &lt;token&gt;<br>
+                &nbsp;&nbsp;→ <span style="color:#93c5fd">Verify signature</span><br>
+                &nbsp;&nbsp;→ Check expiry (24h)<br>
+                &nbsp;&nbsp;→ Extract user claims<br>
+                &nbsp;&nbsp;→ Allow / Deny (401)
+              </div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header"><span class="panel-title">Rate Limiting & Caching</span></div>
+            <div style="padding:20px">
+              <div style="margin-bottom:14px">
+                <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-weight:700">Rate Limit</div>
+                <div style="background:#1e293b;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#fbbf24">100 requests / minute / IP<br>429 Too Many Requests on exceed</div>
+              </div>
+              <div>
+                <div style="font-size:12px;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-weight:700">Edge Cache</div>
+                <div style="background:#1e293b;border-radius:8px;padding:12px;font-family:monospace;font-size:12px;color:#6ee7b7">X-Cache: HIT / MISS<br>GET /employees → TTL 60s<br>GET /dashboard/stats → TTL 30s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">API Endpoints</span></div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Role</th><th>Description</th><th>Test</th></tr></thead>
+              <tbody>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/health</code></td><td>None</td><td>Public</td><td>Service health check</td><td><button class="btn btn-sm btn-secondary" onclick="testEndpoint('GET','/health')">Test</button></td></tr>
+                <tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/v1/auth/login</code></td><td>None</td><td>Public</td><td>Authenticate & get JWT</td><td><button class="btn btn-sm btn-secondary" onclick="testLogin()">Test</button></td></tr>
+                <tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/v1/auth/register</code></td><td>None</td><td>Public</td><td>Create new user account</td><td>—</td></tr>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/api/v1/employees</code></td><td>JWT</td><td>User</td><td>List all employees (cached 60s)</td><td><button class="btn btn-sm btn-secondary" onclick="testEndpoint('GET','/api/v1/employees')">Test</button></td></tr>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/api/v1/employees/:id</code></td><td>JWT</td><td>User</td><td>Get single employee + documents</td><td>—</td></tr>
+                <tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/v1/employees</code></td><td>JWT</td><td>Admin</td><td>Create employee record</td><td>—</td></tr>
+                <tr><td><span class="badge badge-yellow">PUT</span></td><td><code>/api/v1/employees/:id</code></td><td>JWT</td><td>Admin</td><td>Update employee record</td><td>—</td></tr>
+                <tr><td><span class="badge badge-red">DELETE</span></td><td><code>/api/v1/employees/:id</code></td><td>JWT</td><td>Admin</td><td>Delete employee record</td><td>—</td></tr>
+                <tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/v1/employees/:id/documents</code></td><td>JWT</td><td>User</td><td>Upload file to R2 storage</td><td>—</td></tr>
+                <tr><td><span class="badge badge-blue">POST</span></td><td><code>/api/v1/chat</code></td><td>JWT</td><td>User</td><td>Send AI chat message</td><td>—</td></tr>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/api/v1/chat/history</code></td><td>JWT</td><td>User</td><td>Get conversation history</td><td>—</td></tr>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/api/v1/dashboard/stats</code></td><td>JWT</td><td>User</td><td>Dashboard statistics (cached 30s)</td><td>—</td></tr>
+                <tr><td><span class="badge badge-green">GET</span></td><td><code>/api/v1/audit-logs</code></td><td>JWT</td><td>Admin</td><td>Security audit trail</td><td>—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="api-response-box" style="display:none;margin-top:18px" class="panel">
+          <div class="panel-header"><span class="panel-title">API Response</span><span id="api-cache-badge" class="badge badge-blue"></span></div>
+          <div style="padding:20px"><pre id="api-response" style="background:#0d1117;padding:16px;border-radius:10px;font-size:12px;color:#6ee7b7;overflow-x:auto;max-height:300px;overflow-y:auto;border:1px solid var(--border)"></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── HEALTH ── -->
+    <div id="section-health" class="section">
+      <div class="topbar">
+        <div>
+          <div class="page-title">System Health</div>
+          <div class="page-subtitle">Live server diagnostics and status</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-sm btn-success" onclick="loadHealth()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div class="content-body">
+        <div id="health-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px"></div>
+        <div class="panel">
+          <div class="panel-header"><span class="panel-title">Raw Health Response</span></div>
+          <div style="padding:20px">
+            <pre id="health-raw" style="background:#0d1117;padding:16px;border-radius:10px;font-size:12px;color:#6ee7b7;overflow-x:auto;border:1px solid var(--border)">Click Refresh to load health data...</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══════════════════ EMPLOYEE MODAL ══════════════════ -->
+<div class="modal-overlay" id="emp-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Add Employee</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="modal-emp-id"/>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name *</label>
+          <input type="text" id="emp-name" placeholder="John Smith"/>
+        </div>
+        <div class="form-group">
+          <label>Email *</label>
+          <input type="email" id="emp-email" placeholder="john@company.com"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department *</label>
+          <select id="emp-dept">
+            <option value="">Select Department</option>
+            <option>Engineering</option><option>Sales</option><option>Marketing</option>
+            <option>HR</option><option>Finance</option><option>Operations</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Position</label>
+          <input type="text" id="emp-position" placeholder="Software Engineer"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Salary (USD)</label>
+          <input type="number" id="emp-salary" placeholder="75000"/>
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="text" id="emp-phone" placeholder="+1-555-0100"/>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hire Date</label>
+          <input type="date" id="emp-hiredate"/>
+        </div>
+        <div class="form-group" id="status-group" style="display:none">
+          <label>Status</label>
+          <select id="emp-status">
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+      </div>
+      <div id="modal-error" class="alert alert-error"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-success" id="modal-save-btn" onclick="saveEmployee()">Save Employee</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ DOCUMENT UPLOAD MODAL ══════════════════ -->
+<div class="modal-overlay" id="doc-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Upload Document to R2</span>
+      <button class="modal-close" onclick="document.getElementById('doc-modal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Upload employee documents (CV, CNIC, Contracts, Certificates) to Cloudflare R2 storage.</p>
+      <input type="hidden" id="doc-emp-id"/>
+      <div class="upload-area" onclick="document.getElementById('doc-file').click()">
+        <div style="font-size:32px;margin-bottom:8px">📁</div>
+        <div style="font-size:14px;color:var(--text);margin-bottom:4px">Click to select file</div>
+        <div style="font-size:12px;color:var(--muted)">PDF, DOCX, JPG, PNG — Max 10MB</div>
+        <input type="file" id="doc-file" style="display:none" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onchange="updateFileName()"/>
+      </div>
+      <div id="doc-filename" style="margin-top:10px;font-size:13px;color:var(--accent)"></div>
+      <div id="doc-error" class="alert alert-error" style="margin-top:10px"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="document.getElementById('doc-modal').classList.remove('open')">Cancel</button>
+      <button class="btn btn-success" onclick="uploadDocument()">Upload to R2 ☁️</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+const API = 'http://localhost:3000';
+let token = localStorage.getItem('ems_token');
+let currentUser = JSON.parse(localStorage.getItem('ems_user') || 'null');
+let allEmployees = [];
+
+// ── Clock ──
+setInterval(() => {
+  const el = document.getElementById('current-time');
+  if(el) el.textContent = new Date().toLocaleTimeString();
+}, 1000);
+
+// ── Auto-login if token exists ──
+window.addEventListener('load', () => {
+  if(token && currentUser) enterApp();
+});
+
+// ══════════════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════════════
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach((b,i) => b.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register')));
+  document.getElementById('login-form').style.display = tab==='login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab==='register' ? 'block' : 'none';
+  document.getElementById('auth-alert').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  showAuthAlert('');
+  if(!email||!password) return showAuthAlert('Please enter email and password.');
+  try {
+    const r = await fetch(`${API}/api/v1/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const d = await r.json();
+    if(!r.ok) return showAuthAlert(d.error||'Login failed');
+    token=d.token; currentUser=d.user;
+    localStorage.setItem('ems_token',token);
+    localStorage.setItem('ems_user',JSON.stringify(currentUser));
+    enterApp();
+  } catch(e){ showAuthAlert('Cannot connect to server. Is it running on port 3000?'); }
+}
+
+async function doRegister() {
+  const name=document.getElementById('reg-name').value.trim();
+  const email=document.getElementById('reg-email').value.trim();
+  const password=document.getElementById('reg-password').value;
+  showAuthAlert('');
+  if(!name||!email||!password) return showAuthAlert('All fields are required.');
+  try {
+    const r=await fetch(`${API}/api/v1/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+    const d=await r.json();
+    if(!r.ok) return showAuthAlert(d.error||'Registration failed');
+    token=d.token; currentUser=d.user;
+    localStorage.setItem('ems_token',token);
+    localStorage.setItem('ems_user',JSON.stringify(currentUser));
+    enterApp();
+  } catch(e){ showAuthAlert('Cannot connect to server.'); }
+}
+
+function showAuthAlert(msg) {
+  const el=document.getElementById('auth-alert');
+  el.textContent=msg; el.style.display=msg?'block':'none';
+}
+
+function enterApp() {
+  document.getElementById('login-page').style.display='none';
+  document.getElementById('app').style.display='flex';
+  const av=document.getElementById('sidebar-avatar');
+  document.getElementById('sidebar-name').textContent=currentUser.name;
+  document.getElementById('sidebar-role').textContent=currentUser.role==='admin'?'Administrator':'Employee';
+  av.textContent=(currentUser.name||'U')[0].toUpperCase();
+  if(currentUser.role!=='admin') {
+    document.getElementById('nav-audit').style.display='none';
+  }
+  loadDashboard();
+}
+
+function doLogout() {
+  token=null; currentUser=null;
+  localStorage.removeItem('ems_token'); localStorage.removeItem('ems_user');
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-page').style.display='flex';
+}
+
+// ══════════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════════
+function showSection(name) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='dashboard') loadDashboard();
+  if(name==='employees') loadEmployees();
+  if(name==='history') loadHistory();
+  if(name==='audit') loadAuditLogs();
+  if(name==='health') loadHealth();
+}
+
+// ══════════════════════════════════════════════════════
+//  API HELPER
+// ══════════════════════════════════════════════════════
+async function api(method, endpoint, body) {
+  const opts={method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(API+endpoint,opts);
+  if(r.status===401){doLogout();return null;}
+  return r;
+}
+
+// ══════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════
+async function loadDashboard() {
+  try {
+    const r=await api('GET','/api/v1/dashboard/stats');
+    if(!r) return;
+    const d=await r.json();
+    const s=d.stats;
+    document.getElementById('s-total').textContent=s.totalEmployees;
+    document.getElementById('s-active').textContent=s.activeEmployees;
+    document.getElementById('s-dept').textContent=s.departments;
+    document.getElementById('s-conv').textContent=s.totalConversations;
+    document.getElementById('s-audit').textContent=s.auditEvents;
+    document.getElementById('s-docs').textContent=s.documents;
+
+    // Dept chart
+    const max=Math.max(...d.departmentStats.map(x=>x.count),1);
+    document.getElementById('dept-chart').innerHTML=d.departmentStats.map(dep=>`
+      <div class="dept-row">
+        <div class="dept-row-header">
+          <span class="dept-row-name">${dep.department}</span>
+          <span class="dept-row-count">${dep.count} emp · Avg $${dep.avg_salary?Math.round(dep.avg_salary/1000)+'k':'—'}</span>
+        </div>
+        <div class="dept-bar-bg"><div class="dept-bar-fill" style="width:${Math.round(dep.count/max*100)}%"></div></div>
+      </div>`).join('');
+
+    // Recent employees
+    document.getElementById('recent-employees').innerHTML=d.recentEmployees.map(e=>`
+      <tr>
+        <td><div class="td-name"><div class="mini-avatar" style="background:${avatarColor(e.name)}">${e.name[0]}</div>${e.name}</div></td>
+        <td>${e.department}</td>
+        <td>${e.position||'—'}</td>
+        <td><span class="status-pill status-${e.status||'active'}">${e.status||'active'}</span></td>
+        <td>${fmtDate(e.created_at)}</td>
+      </tr>`).join('');
+
+    // Activity
+    document.getElementById('activity-list').innerHTML=d.recentActivity.map(a=>`
+      <div class="activity-item">
+        <div class="activity-icon act-${a.action.toLowerCase()}">${actionIcon(a.action)}</div>
+        <div class="activity-detail">
+          <strong>${a.user_name||'System'} — ${a.action} ${a.resource}</strong>
+          <span>${safeDetails(a.details)}</span>
+        </div>
+        <div class="activity-time">${fmtDate(a.created_at)}</div>
+      </div>`).join('');
+  } catch(e){console.error(e);}
+}
+
+function actionIcon(a){return{CREATE:'➕',UPDATE:'✏️',DELETE:'🗑️',LOGIN:'🔐',UPLOAD:'📤'}[a]||'📝';}
+function safeDetails(d){try{const p=JSON.parse(d);return p.name||p.email||p.file||'';}catch{return d||'';}}
+
+// ══════════════════════════════════════════════════════
+//  EMPLOYEES
+// ══════════════════════════════════════════════════════
+async function loadEmployees() {
+  try {
+    const r=await api('GET','/api/v1/employees?limit=100');
+    if(!r) return;
+    const d=await r.json();
+    allEmployees=d.data||[];
+    renderEmployees(allEmployees);
+
+    // Load dept filter
+    const fr=await api('GET','/api/v1/departments');
+    if(fr){
+      const fd=await fr.json();
+      const sel=document.getElementById('dept-filter');
+      sel.innerHTML='<option value="">All Departments</option>'+fd.data.map(d=>`<option>${d}</option>`).join('');
+    }
+  } catch(e){console.error(e);}
+}
+
+function renderEmployees(list) {
+  const tbody=document.getElementById('employees-table');
+  if(!list.length){
+    tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">👥</div><h3>No employees found</h3></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(e=>`
+    <tr>
+      <td><div class="td-name"><div class="mini-avatar" style="background:${avatarColor(e.name)}">${e.name[0]}</div>
+        <div><div style="font-weight:600">${e.name}</div><div style="font-size:11px;color:var(--muted)">${e.email}</div></div>
+      </div></td>
+      <td>${e.department}</td>
+      <td>${e.position||'—'}</td>
+      <td>${e.salary?'$'+e.salary.toLocaleString():'—'}</td>
+      <td>${e.phone||'—'}</td>
+      <td><span class="status-pill status-${e.status}">${e.status}</span></td>
+      <td>${fmtDate(e.hire_date)}</td>
+      <td>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" onclick="openModal('edit','${e.id}')">✏️</button>
+          <button class="btn btn-sm btn-secondary" onclick="openDocModal('${e.id}')">📎</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteEmployee('${e.id}','${e.name.replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function searchEmployees() {
+  const q=document.getElementById('emp-search').value.toLowerCase();
+  const dept=document.getElementById('dept-filter').value;
+  const status=document.getElementById('status-filter').value;
+  const filtered=allEmployees.filter(e=>
+    (!q||(e.name+e.email+e.department+e.position).toLowerCase().includes(q))&&
+    (!dept||e.department===dept)&&
+    (!status||e.status===status)
+  );
+  renderEmployees(filtered);
+}
+
+function openModal(mode, empId) {
+  document.getElementById('modal-title').textContent=mode==='add'?'Add New Employee':'Edit Employee';
+  document.getElementById('modal-save-btn').textContent=mode==='add'?'Add Employee':'Save Changes';
+  document.getElementById('modal-emp-id').value=empId||'';
+  document.getElementById('status-group').style.display=mode==='edit'?'block':'none';
+  document.getElementById('modal-error').style.display='none';
+  if(mode==='edit'&&empId){
+    const e=allEmployees.find(x=>x.id===empId);
+    if(e){
+      document.getElementById('emp-name').value=e.name;
+      document.getElementById('emp-email').value=e.email;
+      document.getElementById('emp-dept').value=e.department;
+      document.getElementById('emp-position').value=e.position||'';
+      document.getElementById('emp-salary').value=e.salary||'';
+      document.getElementById('emp-phone').value=e.phone||'';
+      document.getElementById('emp-hiredate').value=e.hire_date||'';
+      document.getElementById('emp-status').value=e.status||'active';
+    }
+  } else {
+    ['emp-name','emp-email','emp-position','emp-salary','emp-phone','emp-hiredate'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('emp-dept').value='';
+  }
+  document.getElementById('emp-modal').classList.add('open');
+}
+
+function closeModal(){document.getElementById('emp-modal').classList.remove('open');}
+
+async function saveEmployee() {
+  const id=document.getElementById('modal-emp-id').value;
+  const isEdit=!!id;
+  const body={
+    name:document.getElementById('emp-name').value.trim(),
+    email:document.getElementById('emp-email').value.trim(),
+    department:document.getElementById('emp-dept').value,
+    position:document.getElementById('emp-position').value.trim(),
+    salary:parseFloat(document.getElementById('emp-salary').value)||null,
+    phone:document.getElementById('emp-phone').value.trim(),
+    hire_date:document.getElementById('emp-hiredate').value,
+  };
+  if(isEdit) body.status=document.getElementById('emp-status').value;
+  const errEl=document.getElementById('modal-error');
+  errEl.style.display='none';
+  try {
+    const r=await api(isEdit?'PUT':'POST', isEdit?`/api/v1/employees/${id}`:'/api/v1/employees', body);
+    if(!r) return;
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error;errEl.style.display='block';return;}
+    closeModal();
+    toast(isEdit?'Employee updated successfully':'Employee added successfully','success');
+    loadEmployees();
+    loadDashboard();
+  } catch(e){errEl.textContent='Server error';errEl.style.display='block';}
+}
+
+async function deleteEmployee(id, name) {
+  if(!confirm(`Delete employee "${name}"? This cannot be undone.`)) return;
+  try {
+    const r=await api('DELETE',`/api/v1/employees/${id}`);
+    if(!r) return;
+    if(r.ok){toast('Employee deleted','success');loadEmployees();loadDashboard();}
+    else {const d=await r.json();toast(d.error,'error');}
+  } catch(e){toast('Server error','error');}
+}
+
+// ══════════════════════════════════════════════════════
+//  DOCUMENTS / R2
+// ══════════════════════════════════════════════════════
+function openDocModal(empId) {
+  document.getElementById('doc-emp-id').value=empId;
+  document.getElementById('doc-filename').textContent='';
+  document.getElementById('doc-error').style.display='none';
+  document.getElementById('doc-file').value='';
+  document.getElementById('doc-modal').classList.add('open');
+}
+
+function updateFileName() {
+  const f=document.getElementById('doc-file').files[0];
+  document.getElementById('doc-filename').textContent=f?`Selected: ${f.name} (${(f.size/1024).toFixed(1)} KB)`:'';
+}
+
+async function uploadDocument() {
+  const empId=document.getElementById('doc-emp-id').value;
+  const file=document.getElementById('doc-file').files[0];
+  const errEl=document.getElementById('doc-error');
+  if(!file){errEl.textContent='Please select a file';errEl.style.display='block';return;}
+  const fd=new FormData(); fd.append('file',file);
+  try {
+    const r=await fetch(`${API}/api/v1/employees/${empId}/documents`,{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+    const d=await r.json();
+    if(!r.ok){errEl.textContent=d.error;errEl.style.display='block';return;}
+    document.getElementById('doc-modal').classList.remove('open');
+    toast(`File "${file.name}" uploaded to R2 ☁️`,'success');
+    loadDashboard();
+  } catch(e){errEl.textContent='Upload failed';errEl.style.display='block';}
+}
+
+// ══════════════════════════════════════════════════════
+//  AI CHAT
+// ══════════════════════════════════════════════════════
+async function sendChat() {
+  const inp=document.getElementById('chat-input');
+  const q=inp.value.trim();
+  if(!q) return;
+  inp.value='';
+  addBubble(q,'user');
+  const typing=addTyping();
+  try {
+    const r=await api('POST','/api/v1/chat',{question:q});
+    typing.remove();
+    if(!r){addBubble('Server error.','ai');return;}
+    const d=await r.json();
+    if(!r.ok){addBubble(d.error||'Error','ai');return;}
+    addBubble(d.answer,'ai',d.timestamp);
+  } catch(e){typing.remove();addBubble('Cannot reach server.','ai');}
+}
+
+function addBubble(text,type,time) {
+  const msgs=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className=`chat-bubble bubble-${type}`;
+  div.innerHTML=`${text}<div class="bubble-meta">${type==='ai'?'🤖 EMS AI':'You'} · ${time?fmtDate(time):'just now'}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+function addTyping() {
+  const msgs=document.getElementById('chat-messages');
+  const div=document.createElement('div');
+  div.className='typing-indicator';
+  div.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+  return div;
+}
+
+// ══════════════════════════════════════════════════════
+//  CHAT HISTORY
+// ══════════════════════════════════════════════════════
+async function loadHistory() {
+  try {
+    const r=await api('GET','/api/v1/chat/history?limit=100');
+    if(!r) return;
+    const d=await r.json();
+    const tbody=document.getElementById('history-table');
+    if(!d.data.length){
+      tbody.innerHTML='<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">💬</div><h3>No conversations yet</h3><p>Start a chat to see history here</p></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML=d.data.map((c,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td><span class="q-tag">Q</span> ${c.question}</td>
+        <td style="max-width:300px;color:var(--muted)">${c.answer.substring(0,120)}${c.answer.length>120?'…':''}</td>
+        <td>${fmtDate(c.created_at)}</td>
+      </tr>`).join('');
+  } catch(e){console.error(e);}
+}
+
+// ══════════════════════════════════════════════════════
+//  AUDIT LOGS
+// ══════════════════════════════════════════════════════
+async function loadAuditLogs() {
+  try {
+    const r=await api('GET','/api/v1/audit-logs');
+    if(!r) return;
+    const d=await r.json();
+    document.getElementById('audit-table').innerHTML=d.data.map(a=>`
+      <tr>
+        <td style="font-size:11px;color:var(--muted)">${fmtDate(a.created_at)}</td>
+        <td>${a.user_name||'—'}<div style="font-size:11px;color:var(--muted)">${a.user_email||''}</div></td>
+        <td><span class="badge badge-${actionBadge(a.action)}">${a.action}</span></td>
+        <td>${a.resource}</td>
+        <td style="font-size:12px;color:var(--muted);max-width:200px">${safeDetails(a.details)}</td>
+        <td style="font-size:11px;color:var(--muted)">${a.ip||'—'}</td>
+      </tr>`).join('');
+  } catch(e){console.error(e);}
+}
+
+function actionBadge(a){return{CREATE:'green',UPDATE:'blue',DELETE:'red',LOGIN:'blue',UPLOAD:'yellow'}[a]||'blue';}
+
+// ══════════════════════════════════════════════════════
+//  API GATEWAY TEST
+// ══════════════════════════════════════════════════════
+async function testEndpoint(method, endpoint) {
+  try {
+    const r=await api(method, endpoint);
+    if(!r) return;
+    const data=await r.json();
+    const cache=r.headers.get('X-Cache')||'N/A';
+    const cacheAge=r.headers.get('X-Cache-Age')||'';
+    document.getElementById('api-response-box').style.display='block';
+    document.getElementById('api-cache-badge').textContent=`X-Cache: ${cache}${cacheAge?' ('+cacheAge+')':''}`;
+    document.getElementById('api-cache-badge').className='badge '+(cache==='HIT'?'badge-green':'badge-yellow');
+    document.getElementById('api-response').textContent=JSON.stringify(data,null,2);
+  } catch(e){console.error(e);}
+}
+
+async function testLogin() {
+  try {
+    const r=await fetch(`${API}/api/v1/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@company.com',password:'Admin@123'})});
+    const data=await r.json();
+    document.getElementById('api-response-box').style.display='block';
+    document.getElementById('api-cache-badge').textContent=`HTTP ${r.status} ${r.ok?'OK':'ERROR'}`;
+    document.getElementById('api-cache-badge').className='badge '+(r.ok?'badge-green':'badge-red');
+    document.getElementById('api-response').textContent=JSON.stringify({...data,token:data.token?data.token.substring(0,60)+'...[truncated]':undefined},null,2);
+  } catch(e){console.error(e);}
+}
+
+// ══════════════════════════════════════════════════════
+//  HEALTH
+// ══════════════════════════════════════════════════════
+async function loadHealth() {
+  try {
+    const r=await fetch(`${API}/health`);
+    const d=await r.json();
+    document.getElementById('health-raw').textContent=JSON.stringify(d,null,2);
+    document.getElementById('health-grid').innerHTML=`
+      <div class="stat-card green"><div class="stat-icon">❤️</div><div class="stat-value">${d.status}</div><div class="stat-label">System Status</div></div>
+      <div class="stat-card blue"><div class="stat-icon">⏱️</div><div class="stat-value">${d.uptime}</div><div class="stat-label">Server Uptime</div></div>
+      <div class="stat-card purple"><div class="stat-icon">🗄️</div><div class="stat-value">${d.database}</div><div class="stat-label">Database</div></div>
+    `;
+  } catch(e){
+    document.getElementById('health-raw').textContent='Error: Cannot connect to server on port 3000';
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════════
+const COLORS=['#3b82f6','#8b5cf6','#10b981','#f59e0b','#ef4444','#06b6d4','#ec4899'];
+function avatarColor(name){return COLORS[name.charCodeAt(0)%COLORS.length];}
+
+function fmtDate(d){
+  if(!d) return '—';
+  try{
+    const dt=new Date(d);
+    return dt.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+  }catch{return d;}
+}
+
+function toast(msg,type='success'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className=`show toast-${type}`;
+  setTimeout(()=>el.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
