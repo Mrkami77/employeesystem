@@ -1,34 +1,28 @@
-name            = "ems-edge-api"
+name            = "employeesystem"
 main            = "worker.js"
 compatibility_date = "2024-01-01"
-account_id      = "YOUR_CLOUDFLARE_ACCOUNT_ID"
+account_id      = "34c05cf0fc5baa8d8121d292544c729d"
 
-# ─── D1 Database ──────────────────────────────────────────────────────────────
 [[d1_databases]]
 binding  = "DB"
 database_name = "ems-database"
-database_id   = "YOUR_D1_DATABASE_ID"
+database_id   = "a9b03f8a-4e0b-417a-9ef1-41cf30fd03ae"
 
-# ─── R2 Storage ───────────────────────────────────────────────────────────────
 [[r2_buckets]]
 binding     = "R2"
 bucket_name = "ems-documents"
 
-# ─── KV Namespace (Rate Limiting) ─────────────────────────────────────────────
 [[kv_namespaces]]
 binding = "KV"
-id      = "YOUR_KV_NAMESPACE_ID"
+id      = "b91b4e2738264f259a0106af4dcea875"
 
-# ─── Environment Variables ────────────────────────────────────────────────────
 [vars]
 ENVIRONMENT = "production"
 
-# ─── Production Environment ───────────────────────────────────────────────────
 [env.production]
 name = "ems-edge-api-production"
 vars = { ENVIRONMENT = "production" }
 
-# ─── Staging Environment ──────────────────────────────────────────────────────
 [env.staging]
 name = "ems-edge-api-staging"
 vars = { ENVIRONMENT = "staging" }
